@@ -5,6 +5,7 @@ import { useGoToSection } from '@/hooks/useGoToSection'
 import { SectionScrollerContext } from '@/hooks/SectionScrollerContext'
 import { SECTIONS, NAV_SECTIONS } from '@/data/sections'
 import { MagneticButton } from '@/components/UI/MagneticButton'
+import { MotionStyleToggle } from '@/components/UI/MotionStyleToggle'
 
 export function Navbar() {
   const scroller = useContext(SectionScrollerContext)
@@ -35,7 +36,7 @@ export function Navbar() {
               ? 'border-white/10 bg-black/60 px-5 py-2.5 backdrop-blur-xl shadow-[0_1px_0_rgba(255,255,255,0.06)]'
               : 'border-transparent bg-transparent px-5 py-2.5'
           }`}
-          style={{ maxWidth: scrolled ? 900 : 1400, marginInline: 'auto' }}
+          style={{ maxWidth: scrolled ? 1120 : 1400, marginInline: 'auto' }}
         >
           <a
             href="#home"
@@ -84,19 +85,22 @@ export function Navbar() {
             ))}
           </ul>
 
-          <MagneticButton
-            as="a"
-            href="#contact"
-            cursorMode="button"
-            strength={0.3}
-            onClick={(e: React.MouseEvent) => {
-              e.preventDefault()
-              goToSection('contact')
-            }}
-            className="hidden rounded-full border border-white/25 px-4 py-2 text-xs font-medium uppercase tracking-[0.12em] text-white hover:border-white hover:bg-white hover:text-black lg:inline-block"
-          >
-            Let&apos;s Talk
-          </MagneticButton>
+          <div className="hidden items-center gap-3 lg:flex">
+            <MotionStyleToggle />
+            <MagneticButton
+              as="a"
+              href="#contact"
+              cursorMode="button"
+              strength={0.3}
+              onClick={(e: React.MouseEvent) => {
+                e.preventDefault()
+                goToSection('contact')
+              }}
+              className="whitespace-nowrap rounded-full border border-white/25 px-4 py-2 text-xs font-medium uppercase tracking-[0.12em] text-white hover:border-white hover:bg-white hover:text-black"
+            >
+              Let&apos;s Talk
+            </MagneticButton>
+          </div>
 
           <button
             type="button"
@@ -151,6 +155,14 @@ export function Navbar() {
               </a>
             </li>
           ))}
+          <li
+            style={{ transitionDelay: mobileOpen ? `${NAV_SECTIONS.length * 60}ms` : '0ms' }}
+            className={`mt-6 transition-all duration-500 ${
+              mobileOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+            }`}
+          >
+            <MotionStyleToggle />
+          </li>
         </ul>
       </div>
     </>

@@ -41,7 +41,7 @@ export function Hero() {
           className="text-balance font-display text-[13vw] font-medium leading-[0.98] tracking-tight text-white opacity-0 sm:text-[9vw] md:text-[6.5vw] lg:text-[5.5rem]"
           style={{ textShadow: '0 4px 40px rgba(0,0,0,0.65), 0 1px 3px rgba(0,0,0,0.5)' }}
         >
-          Hi, I&apos;m a <span className="italic text-white/90">Developer.</span>
+          Hi, I&apos;m <span className="italic text-white/90">Sathish.</span>
         </h1>
 
         <p
@@ -105,14 +105,6 @@ export function Hero() {
           <div className="h-full w-full animate-[scrollLine_2.2s_ease-in-out_infinite] bg-white/70" />
         </div>
       </div>
-
-      <style>{`
-        @keyframes scrollLine {
-          0% { transform: translateY(-100%); }
-          50% { transform: translateY(0%); }
-          100% { transform: translateY(100%); }
-        }
-      `}</style>
     </section>
   )
 }

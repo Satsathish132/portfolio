@@ -3,9 +3,10 @@
 A premium, interactive 3D developer portfolio built with React, Vite, TypeScript,
 Tailwind CSS and Three.js (via React Three Fiber). The visual identity is a
 custom WebGL liquid/paint shader that reacts to pointer movement, scroll and
-section transitions — monochrome, cinematic, and GPU-light. Navigation is a
-cinematic "camera journey" through the site rather than conventional document
-scrolling (see **Cinematic navigation** below).
+section transitions — monochrome, cinematic, and GPU-light.
+
+The site ships **two motion styles**, and the visitor picks between them from
+the navbar; the choice persists in localStorage (see **Motion styles** below).
 
 ## Stack
 
@@ -27,6 +28,78 @@ npm run build    # type-check + production build
 npm run lint     # oxlint
 npm run preview  # preview the production build locally
 ```
+
+## Motion styles
+
+`useMotionStyle` (`src/hooks/useMotionStyle.ts`) holds the visitor's choice in
+`localStorage` under `portfolio:motion-style`. It is a module-level store read
+through `useSyncExternalStore`, so the navbar toggle, `App` and `Reveal` all
+share one value, and a `storage` listener keeps duplicate tabs in sync. Every
+localStorage access is wrapped in try/catch — it *throws*, not just returns
+null, in Safari private mode.
+
+| Style | Scroll model | Feel |
+| --- | --- | --- |
+| `cinematic` (default) | Scroll is **hijacked**: sections are `position: fixed` and snap one per gesture | Camera dolly through a 3D environment |
+| `scroll-story` | **Real** scroll, lerped, with `position: sticky` pinned scenes | Long-form scrollytelling (Scout Motors style) |
+
+The two are mutually exclusive — one takes scroll away, the other is driven by
+it — so `App.tsx` picks exactly one. `prefers-reduced-motion` overrides both
+and renders the plain document fallback.
+
+Switching style remounts the page, so `App` re-anchors to the section in the
+URL hash to keep the reader's place.
+
+### Scroll-story mode
+
+Lives in `src/components/scroll-story/`. It reuses the *same* section
+components the cinematic mode renders — they already lay out correctly in
+normal document flow, which is how the reduced-motion fallback has always
+worked. What changes is the connective tissue.
+
+- **`scrollDriver.ts`** — one shared rAF loop that every scroll-driven effect
+  subscribes to, rather than one loop (and one React state update) per
+  animated element. Subscribers read their own rect and write
+  `transform`/`opacity` directly; the loop idles when nothing is subscribed
+  and skips work while the tab is hidden.
+- **`ScrollScene`** — a tall outer track whose inner stage is `position:
+  sticky`, so the stage pins while the page scrolls past it. Scene progress
+  (0 on lock, 1 on release) is published through context. The pin is native
+  CSS, not transform math, so the compositor owns it.
+- **`SceneLayer`** — one animated layer in a scene. Takes `[from, to]` tweens
+  for `y`/`x`/`scale`/`opacity`/`blur`/`rotate` plus a `range` slice of scene
+  progress, so layers can be sequenced into acts.
+- **`Parallax`** — viewport-relative depth drift, independent of any scene.
+  Displacement is zero as the element crosses the viewport centre, so a
+  parallax layer always lands in its authored position when most visible.
+- **`MaskedText`** — words rise out of individual overflow masks. The masks
+  carry padding plus a cancelling negative margin so descenders are not
+  clipped. The split words are `aria-hidden` with one `sr-only` copy of the
+  original string, so screen readers hear a sentence, not a word list.
+- **`ClipReveal`** — a `clip-path` wipe with an inner counter-scale. The wipe
+  and the scale are on two different elements on purpose: on one element the
+  clip rectangle would scale with the content and the wipe would vanish.
+- **`HorizontalGallery`** — the numbered "viewfinder". Vertical scroll is
+  remapped to horizontal travel, measured from the real rendered row width so
+  the last panel lands flush. The `01 / 06` counter is derived from which
+  panel is actually centred and written via `textContent`, not React state —
+  it updates every frame.
+
+`Reveal` (`src/components/UI/Reveal.tsx`) reads the active style and swaps its
+own entrance — fade-and-rise in cinematic, clip-path wipe in scroll-story — so
+every section that already used it upgrades without being touched.
+
+**Smooth scroll** (`useSmoothScroll`) eases the *real* `window.scrollTo`
+rather than transforming the page body: the body-transform approach breaks
+`position: sticky` and `position: fixed`, and the whole scroll-story layout is
+built on sticky pinning. It normalises the three wheel `deltaMode` values,
+eases frame-rate independently (so 60Hz and 144Hz feel the same), adopts any
+scroll it did not cause (keyboard, scrollbar drag, find-in-page), and leaves
+touch to the platform's native momentum.
+
+Note `body { overflow-x: clip }` in `index.css` — not `hidden`. `hidden` makes
+body a scroll container, which is the classic way to break `position: sticky`
+descendants.
 
 ## Cinematic navigation
 
@@ -91,7 +164,11 @@ src/
     Contact/        Contact form + real social/professional links
     Footer/
     UI/             Reusable primitives: CustomCursor, MagneticButton, Reveal,
-                     SectionLayer, SkipLink
+                     SectionLayer, SkipLink, MotionStyleToggle
+    scroll-story/   The Scout-style continuous-scroll mode: scrollDriver (shared
+                     rAF loop), ScrollScene (sticky pin), SceneLayer, Parallax,
+                     MaskedText, ClipReveal, HorizontalGallery, ScrollStoryHero,
+                     ScrollStory (the layout)
     3d/
       LiquidBackground/   The fullscreen WebGL shader (liquidShaders.ts) +
                            its React Three Fiber driver (LiquidPlane.tsx,
@@ -107,7 +184,9 @@ src/
     journey.ts      Timeline milestones. Omit `period` for an undated entry.
     socialLinks.ts  Real contact/social links + display name.
 
-  hooks/            useSectionScroller (cinematic nav state machine),
+  hooks/            useMotionStyle (persisted motion-style choice),
+                     useSmoothScroll (lerped real scrolling),
+                     useSectionScroller (cinematic nav state machine),
                      useGoToSection (jump to a section from anywhere),
                      useMousePosition (singleton pointer tracker),
                      useScrollProgress, useActiveSection, useReducedMotion,
@@ -128,6 +207,8 @@ than fake details.
 
 ## Performance notes
 
+- The scroll-story layout is `React.lazy`-split, so visitors on the default
+  cinematic style never download its scene machinery (~4kB gzip).
 - The Three.js/R3F bundle backs the liquid background and Skills' 3D accent;
   both `LiquidBackground` and the section-scoped `SkillsScene` are
   code-split via `React.lazy` so first paint never waits on WebGL.
