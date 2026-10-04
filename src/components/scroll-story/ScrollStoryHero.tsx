@@ -43,9 +43,13 @@ export function ScrollStoryHero() {
         <span className="h-px w-[min(90vw,1400px)] bg-gradient-to-r from-transparent via-white/25 to-transparent" />
       </SceneLayer>
 
-      {/* Act one: the introduction, which recedes as the reader scrolls in. */}
+      {/* Act one: the introduction. Holds fully readable for the first tenth
+          of the scene, then recedes at an even (un-eased) pace — an eased
+          curve front-loads the change, so the intro was already half gone
+          after the first flick of the wheel. */}
       <SceneLayer
-        range={[0, 0.45]}
+        range={[0.1, 0.5]}
+        eased={false}
         y={[0, -14]}
         opacity={[1, 0]}
         scale={[1, 0.94]}
@@ -57,7 +61,7 @@ export function ScrollStoryHero() {
           as="p"
           text="Computer Science Developer"
           stagger={60}
-          className="mb-6 font-display text-[clamp(0.6rem,2.6vw,0.75rem)] font-medium uppercase tracking-[clamp(0.1em,1vw,0.35em)] text-white/60"
+          className="mb-6 font-display text-[clamp(0.65rem,2.6vw,0.75rem)] font-medium uppercase tracking-[clamp(0.1em,1vw,0.35em)] text-white/60"
         />
         <MaskedText
           as="h1"
@@ -76,9 +80,11 @@ export function ScrollStoryHero() {
         />
       </SceneLayer>
 
-      {/* Act two: the statement that arrives as act one leaves. */}
+      {/* Act two: the statement that arrives as act one leaves. Its range
+          overlaps act one's so the two cross-fade — with a gap between them,
+          there was a stretch of scroll where the screen was empty. */}
       <SceneLayer
-        range={[0.42, 0.92]}
+        range={[0.38, 0.85]}
         y={[16, -6]}
         opacity={[0, 1]}
         scale={[0.96, 1]}

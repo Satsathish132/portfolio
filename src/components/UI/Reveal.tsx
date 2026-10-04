@@ -25,6 +25,14 @@ interface RevealProps {
  *                    the Scout-style reveals used elsewhere in that mode.
  *                    Real scrolling gives each element its own moment, which
  *                    earns the heavier treatment.
+ *
+ * The observed element and the animated element are deliberately separate.
+ * Chrome's IntersectionObserver applies the target's *own* clip-path when
+ * measuring it, so observing an element that starts at `inset(0 0 100% 0)`
+ * reports a 0% intersection forever: the reveal never fires and the content
+ * stays hidden. The outer element is never clipped; only the inner one is.
+ * The inner wrapper is `h-full` so cards that stretch to their grid row
+ * keep doing so through the extra layer.
  */
 export function Reveal({ children, className = '', delay = 0, as = 'div', y = 28 }: RevealProps) {
   const ref = useRef<HTMLElement>(null)
@@ -71,5 +79,11 @@ export function Reveal({ children, className = '', delay = 0, as = 'div', y = 28
         willChange: 'opacity, transform',
       }
 
-  return createElement(Tag, { ref, className, style }, children)
+  return createElement(
+    Tag,
+    { ref, className },
+    <div className="h-full" style={style}>
+      {children}
+    </div>,
+  )
 }

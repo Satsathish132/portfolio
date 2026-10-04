@@ -29,7 +29,7 @@ export function Footer() {
                 rel={link.external ? 'noopener noreferrer' : undefined}
                 cursorMode="link"
                 strength={0.2}
-                className="text-xs font-medium uppercase tracking-[0.15em] text-white/50 hover:text-white"
+                className="-my-3.5 inline-block py-3.5 text-xs font-medium uppercase tracking-[0.15em] text-white/50 hover:text-white"
               >
                 {link.label}
               </MagneticButton>

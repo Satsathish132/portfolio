@@ -17,6 +17,7 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useDeviceTier } from '@/hooks/useDeviceTier'
 import { useMotionStyle } from '@/hooks/useMotionStyle'
 import { useSmoothScroll } from '@/hooks/useSmoothScroll'
+import { ScrollStory } from '@/components/scroll-story/ScrollStory'
 import { SECTIONS, NAV_SECTIONS, sectionIndex } from '@/data/sections'
 
 // The 3D liquid background is the heaviest dependency (three.js + fiber) —
@@ -25,11 +26,6 @@ const LiquidBackground = lazy(() =>
   import('@/components/3d/LiquidBackground/LiquidBackground').then((m) => ({ default: m.LiquidBackground })),
 )
 
-// The scroll-story mode's scene machinery is only needed if the visitor has
-// chosen it, so it is split out of the initial bundle the same way.
-const ScrollStory = lazy(() =>
-  import('@/components/scroll-story/ScrollStory').then((m) => ({ default: m.ScrollStory })),
-)
 
 // SECTIONS (id + z-depth + optional nav label) is the single source of
 // truth for section order — see src/data/sections.ts. Component order here
@@ -134,9 +130,7 @@ function App() {
       ) : storyEnabled ? (
         <div className="relative z-10">
           <main id="main-content">
-            <Suspense fallback={null}>
-              <ScrollStory />
-            </Suspense>
+            <ScrollStory />
           </main>
         </div>
       ) : (

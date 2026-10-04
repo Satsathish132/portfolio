@@ -6,6 +6,7 @@ import { SectionScrollerContext } from '@/hooks/SectionScrollerContext'
 import { SECTIONS, NAV_SECTIONS } from '@/data/sections'
 import { MagneticButton } from '@/components/UI/MagneticButton'
 import { MotionStyleToggle } from '@/components/UI/MotionStyleToggle'
+import { MOTION_STYLE_SWITCHING_ENABLED } from '@/hooks/useMotionStyle'
 
 export function Navbar() {
   const scroller = useContext(SectionScrollerContext)
@@ -36,7 +37,7 @@ export function Navbar() {
               ? 'border-white/10 bg-black/60 px-5 py-2.5 backdrop-blur-xl shadow-[0_1px_0_rgba(255,255,255,0.06)]'
               : 'border-transparent bg-transparent px-5 py-2.5'
           }`}
-          style={{ maxWidth: scrolled ? 1120 : 1400, marginInline: 'auto' }}
+          style={{ maxWidth: scrolled ? (MOTION_STYLE_SWITCHING_ENABLED ? 1120 : 900) : 1400, marginInline: 'auto' }}
         >
           <a
             href="#home"
@@ -44,7 +45,7 @@ export function Navbar() {
               e.preventDefault()
               goToSection('home')
             }}
-            className="flex items-center gap-2 font-display text-sm font-semibold tracking-tight text-white"
+            className="-my-2 flex items-center gap-2 py-2 font-display text-sm font-semibold tracking-tight text-white"
             data-cursor="link"
           >
             <span className="relative h-7 w-7 overflow-hidden rounded-full border border-white/25 bg-white/5">
@@ -86,7 +87,7 @@ export function Navbar() {
           </ul>
 
           <div className="hidden items-center gap-3 lg:flex">
-            <MotionStyleToggle />
+            {MOTION_STYLE_SWITCHING_ENABLED && <MotionStyleToggle />}
             <MagneticButton
               as="a"
               href="#contact"
@@ -155,14 +156,16 @@ export function Navbar() {
               </a>
             </li>
           ))}
-          <li
-            style={{ transitionDelay: mobileOpen ? `${NAV_SECTIONS.length * 60}ms` : '0ms' }}
-            className={`mt-6 transition-all duration-500 ${
-              mobileOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-            }`}
-          >
-            <MotionStyleToggle />
-          </li>
+          {MOTION_STYLE_SWITCHING_ENABLED && (
+            <li
+              style={{ transitionDelay: mobileOpen ? `${NAV_SECTIONS.length * 60}ms` : '0ms' }}
+              className={`mt-6 transition-all duration-500 ${
+                mobileOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+              }`}
+            >
+              <MotionStyleToggle />
+            </li>
+          )}
         </ul>
       </div>
     </>

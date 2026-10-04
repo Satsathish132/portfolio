@@ -20,7 +20,16 @@ export const MOTION_STYLE_LABELS: Record<MotionStyle, string> = {
 }
 
 const STORAGE_KEY = 'portfolio:motion-style'
-const DEFAULT_STYLE: MotionStyle = 'cinematic'
+const DEFAULT_STYLE: MotionStyle = 'scroll-story'
+
+/**
+ * Cinematic is hidden for now. While this is false every visitor gets
+ * `DEFAULT_STYLE`, the navbar toggle is not rendered, and a previously
+ * stored 'cinematic' choice is ignored (not deleted — it applies again if
+ * switching is re-enabled). The cinematic code path itself is untouched;
+ * flip this to true to bring the switch back.
+ */
+export const MOTION_STYLE_SWITCHING_ENABLED = false
 
 function isMotionStyle(value: unknown): value is MotionStyle {
   return value === 'cinematic' || value === 'scroll-story'
@@ -75,6 +84,7 @@ function subscribe(fn: () => void): () => void {
 }
 
 function getSnapshot(): MotionStyle {
+  if (!MOTION_STYLE_SWITCHING_ENABLED) return DEFAULT_STYLE
   if (current === null) current = readStored()
   return current
 }

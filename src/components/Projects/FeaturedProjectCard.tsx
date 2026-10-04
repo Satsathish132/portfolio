@@ -66,7 +66,7 @@ export function FeaturedProjectCard({ project }: FeaturedProjectCardProps) {
             <button
               type="button"
               onClick={() => setExpanded((v) => !v)}
-              className="mt-6 text-left text-sm font-medium text-white/50 underline decoration-white/20 underline-offset-4 transition-colors hover:text-white"
+              className="mt-3 py-3 text-left text-sm font-medium text-white/50 underline decoration-white/20 underline-offset-4 transition-colors hover:text-white"
               aria-expanded={expanded}
             >
               {expanded ? 'Hide problem statement −' : 'What problem does this solve? +'}

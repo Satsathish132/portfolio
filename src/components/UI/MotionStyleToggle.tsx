@@ -1,6 +1,6 @@
 import { MOTION_STYLE_LABELS, useMotionStyle, type MotionStyle } from '@/hooks/useMotionStyle'
 
-const ORDER: MotionStyle[] = ['cinematic', 'scroll-story']
+const ORDER: MotionStyle[] = ['scroll-story', 'cinematic']
 
 interface MotionStyleToggleProps {
   className?: string

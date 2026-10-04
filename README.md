@@ -5,8 +5,9 @@ Tailwind CSS and Three.js (via React Three Fiber). The visual identity is a
 custom WebGL liquid/paint shader that reacts to pointer movement, scroll and
 section transitions — monochrome, cinematic, and GPU-light.
 
-The site ships **two motion styles**, and the visitor picks between them from
-the navbar; the choice persists in localStorage (see **Motion styles** below).
+The site has **two motion styles**. Scroll Story (a Scout-Motors-style
+scrolling page) is the one visitors see; Cinematic (a section-snap "camera
+journey") is built but **hidden for now** — see **Motion styles** below.
 
 ## Stack
 
@@ -31,6 +32,12 @@ npm run preview  # preview the production build locally
 
 ## Motion styles
 
+**Cinematic is currently hidden.** `MOTION_STYLE_SWITCHING_ENABLED` in
+`src/hooks/useMotionStyle.ts` is `false`, so every visitor gets
+`scroll-story`, the navbar toggle isn't rendered, and any stored
+`'cinematic'` choice is ignored (but kept). The cinematic code is untouched —
+set the flag to `true` to bring the switch back.
+
 `useMotionStyle` (`src/hooks/useMotionStyle.ts`) holds the visitor's choice in
 `localStorage` under `portfolio:motion-style`. It is a module-level store read
 through `useSyncExternalStore`, so the navbar toggle, `App` and `Reveal` all
@@ -40,8 +47,8 @@ null, in Safari private mode.
 
 | Style | Scroll model | Feel |
 | --- | --- | --- |
-| `cinematic` (default) | Scroll is **hijacked**: sections are `position: fixed` and snap one per gesture | Camera dolly through a 3D environment |
-| `scroll-story` | **Real** scroll, lerped, with `position: sticky` pinned scenes | Long-form scrollytelling (Scout Motors style) |
+| `cinematic` | Scroll is **hijacked**: sections are `position: fixed` and snap one per gesture | Camera dolly through a 3D environment |
+| `scroll-story` (default) | **Real** scroll, lerped, with `position: sticky` pinned scenes | Long-form scrollytelling (Scout Motors style) |
 
 The two are mutually exclusive — one takes scroll away, the other is driven by
 it — so `App.tsx` picks exactly one. `prefers-reduced-motion` overrides both
@@ -207,8 +214,8 @@ than fake details.
 
 ## Performance notes
 
-- The scroll-story layout is `React.lazy`-split, so visitors on the default
-  cinematic style never download its scene machinery (~4kB gzip).
+- The scroll-story layout ships in the main bundle — it is the main
+  experience, so splitting it out would only delay first paint by a request.
 - The Three.js/R3F bundle backs the liquid background and Skills' 3D accent;
   both `LiquidBackground` and the section-scoped `SkillsScene` are
   code-split via `React.lazy` so first paint never waits on WebGL.

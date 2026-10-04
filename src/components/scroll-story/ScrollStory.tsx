@@ -24,6 +24,14 @@ import { Parallax } from './Parallax'
  * offsets, and `Reveal` upgrading itself to a clip-path wipe (see
  * `UI/Reveal.tsx`). "What I Build" is the one swap — its numbered services
  * map directly onto Scout's numbered viewfinder gallery.
+ *
+ * Pinned scenes overlap their neighbours (the negative top margins below).
+ * A pinned stage is a full screen with its content centred, so without the
+ * overlap every scene arrives and leaves with half the viewport showing
+ * nothing but background — on Scout's site those stages are full-bleed
+ * photography and never read as empty, but here the stage is transparent.
+ * The overlaps are sized so content never collides: a stage's centred text
+ * sits at ~50svh while the overlapped neighbour only reaches ~22svh into it.
  */
 export function ScrollStory() {
   const galleryItems: GalleryItem[] = services.map((service) => ({
@@ -33,10 +41,12 @@ export function ScrollStory() {
   }))
 
   return (
-    <>
+    // `story-flow` tightens the section padding for continuous scroll —
+    // see index.css.
+    <div className="story-flow">
       <ScrollStoryHero />
 
-      <Parallax speed={0.18}>
+      <Parallax speed={0.18} className="-mt-[22svh]">
         <About />
       </Parallax>
 
@@ -46,14 +56,18 @@ export function ScrollStory() {
         statement="Ideas become software that is useful, scalable and easy to maintain."
       />
 
-      <HorizontalGallery
-        id="build"
-        heading="What I build."
-        items={galleryItems}
-        aria-label="What I build"
-      />
+      <div className="-mt-[22svh]">
+        <HorizontalGallery
+          id="build"
+          heading="What I build."
+          items={galleryItems}
+          aria-label="What I build"
+        />
+      </div>
 
-      <Parallax speed={0.14}>
+      {/* Smaller overlap here: the gallery's progress bar sits lower in its
+          stage than a statement's text does. */}
+      <Parallax speed={0.14} className="-mt-[15svh]">
         <Skills />
       </Parallax>
 
@@ -63,7 +77,9 @@ export function ScrollStory() {
         statement="Selected work, built end to end."
       />
 
-      <Projects />
+      <div className="-mt-[22svh]">
+        <Projects />
+      </div>
 
       <Parallax speed={0.14}>
         <Experience />
@@ -71,7 +87,7 @@ export function ScrollStory() {
 
       <Contact />
       <Footer />
-    </>
+    </div>
   )
 }
 
@@ -88,12 +104,19 @@ interface StatementSceneProps {
  */
 function StatementScene({ id, eyebrow, statement }: StatementSceneProps) {
   return (
-    <ScrollScene id={id} pages={1.8} aria-label={eyebrow}>
+    <ScrollScene
+      id={id}
+      pages={1.8}
+      aria-label={eyebrow}
+      className="-mt-[22svh]"
+      // The stage's empty top band overlaps the previous section's tail; it
+      // must not swallow clicks meant for whatever is underneath it.
+      stageClassName="pointer-events-none"
+    >
       <SceneLayer
         range={[0, 1]}
         y={[8, -8]}
         scale={[1.04, 1]}
-        opacity={[0.35, 1]}
         className="container-portfolio relative text-center"
       >
         <p className="font-display text-xs font-medium uppercase tracking-[0.3em] text-white/40">

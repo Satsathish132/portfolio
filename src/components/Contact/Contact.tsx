@@ -28,7 +28,7 @@ export function Contact() {
             <Reveal delay={240}>
               <ul className="mt-12 flex flex-col gap-1">
                 {socialLinks.map((link) => (
-                  <li key={link.label} className="border-b border-white/10 py-4 first:border-t">
+                  <li key={link.label} className="border-b border-white/10 first:border-t">
                     <MagneticButton
                       as="a"
                       href={link.href}
@@ -36,7 +36,7 @@ export function Contact() {
                       rel={link.external ? 'noopener noreferrer' : undefined}
                       cursorMode="link"
                       strength={0.15}
-                      className="flex items-center justify-between gap-4 text-white"
+                      className="flex items-center justify-between gap-4 py-4 text-white"
                     >
                       <span className="font-display text-lg font-medium tracking-tight">{link.label}</span>
                       <span className="flex items-center gap-2 text-sm text-white/40">

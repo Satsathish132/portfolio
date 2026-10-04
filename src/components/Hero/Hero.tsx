@@ -28,7 +28,7 @@ export function Hero() {
           data-reveal
           className="mb-6 whitespace-nowrap font-display font-medium uppercase text-white/60 opacity-0"
           style={{
-            fontSize: 'clamp(0.6rem, 2.6vw, 0.75rem)',
+            fontSize: 'clamp(0.65rem, 2.6vw, 0.75rem)',
             letterSpacing: 'clamp(0.1em, 1vw, 0.35em)',
             textShadow: '0 2px 12px rgba(0,0,0,0.6)',
           }}

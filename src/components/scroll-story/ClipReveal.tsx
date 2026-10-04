@@ -28,6 +28,10 @@ const HIDDEN_INSET: Record<ClipDirection, string> = {
  * The wipe and the counter-scale live on two different elements: animating
  * clip-path and transform on one element would make the clip rectangle
  * scale along with the content and lose the wipe entirely.
+ *
+ * And the observed element is a third, unclipped one: IntersectionObserver
+ * applies the target's own clip-path, so an element observed while clipped
+ * to nothing reports 0% visible and would never reveal.
  */
 export function ClipReveal({
   children,
@@ -61,27 +65,28 @@ export function ClipReveal({
   }, [reducedMotion])
 
   return (
-    <div
-      ref={ref}
-      className={className}
-      style={{
-        clipPath: revealed ? 'inset(0 0 0 0)' : HIDDEN_INSET[direction],
-        transition: reducedMotion
-          ? 'none'
-          : `clip-path 1.15s cubic-bezier(0.16,1,0.3,1) ${delay}ms`,
-        willChange: 'clip-path',
-      }}
-    >
+    <div ref={ref} className={className}>
       <div
+        className="h-full"
         style={{
-          transform: revealed ? 'scale(1)' : `scale(${scaleFrom})`,
+          clipPath: revealed ? 'inset(0 0 0 0)' : HIDDEN_INSET[direction],
           transition: reducedMotion
             ? 'none'
-            : `transform 1.4s cubic-bezier(0.16,1,0.3,1) ${delay}ms`,
-          willChange: 'transform',
+            : `clip-path 1.15s cubic-bezier(0.16,1,0.3,1) ${delay}ms`,
+          willChange: 'clip-path',
         }}
       >
-        {children}
+        <div
+          style={{
+            transform: revealed ? 'scale(1)' : `scale(${scaleFrom})`,
+            transition: reducedMotion
+              ? 'none'
+              : `transform 1.4s cubic-bezier(0.16,1,0.3,1) ${delay}ms`,
+            willChange: 'transform',
+          }}
+        >
+          {children}
+        </div>
       </div>
     </div>
   )
